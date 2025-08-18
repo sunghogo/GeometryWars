@@ -11,9 +11,6 @@ public enum GameState
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-
-    public static event Action OnBricksCreated;
-    public static event Action OnBrickDestroyed;
     public static event Action<int> OnScoreChanged;
     public static event Action<int> OnHighScoreChanged;
     public static event Action<int> OnLivesChanged;
@@ -33,34 +30,18 @@ public class GameManager : MonoBehaviour
     [field: SerializeField] public int StartingLives { get; private set; } = 3;
 
     [field: Header("Shared Data")]
-    [field: SerializeField] public float minX { get; private set; } = 0;
-    [field: SerializeField] public float maxX { get; private set; } = 0;
-    [field: SerializeField] public float minY { get; private set; } = 0;
-    [field: SerializeField] public float maxY { get; private set; } = 0;
-    [field: SerializeField] public float totalBricks { get; private set; } = 0;
-    [field: SerializeField] public float currentBricks { get; private set; } = 0;
+    [field: SerializeField] public Vector3 PlayerPostion { get; private set; }
+    [field: SerializeField] public float MinX { get; private set; } = 0;
+    [field: SerializeField] public float MaxX { get; private set; } = 0;
+    [field: SerializeField] public float MinY { get; private set; } = 0;
+    [field: SerializeField] public float MaxY { get; private set; } = 0;
     [field: SerializeField] public int Score { get; private set; } = 0;
     [field: SerializeField] public int HighScore { get; private set; } = 0;
     [field: SerializeField] public int Lives { get; private set; }
 
-    public void UpdateBricksNumber(int n)
-    {
-        totalBricks = n;
-        currentBricks = totalBricks;
-        OnBricksCreated?.Invoke();
-    }
 
-    public void DecrementBricks()
-    {
-        --currentBricks;
-        OnBrickDestroyed?.Invoke();
-        if (currentBricks == 0) Instance.NextLevel();
-    }
-
-    public void NextLevel()
-    {
-        ChangeLevel = true;
-        OnNextLevel?.Invoke();
+    public void SetPlayerPosition(Vector3 newPosition) {
+        PlayerPostion = newPosition;
     }
 
     public void IncrementScore()
@@ -127,16 +108,22 @@ public class GameManager : MonoBehaviour
         OnScreenStart?.Invoke();
     }
 
+    public void NextLevel()
+    {
+        ChangeLevel = true;
+        OnNextLevel?.Invoke();
+    }
+
     public void SetMinMaxXY(GameObject obj)
     {
         SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
         if (spriteRenderer == null) return;
 
         Bounds bounds = spriteRenderer.bounds;
-        minX = bounds.min.x;
-        maxX = bounds.max.x;
-        minY = bounds.min.y;
-        maxY = bounds.max.y;
+        MinX = bounds.min.x;
+        MaxX = bounds.max.x;
+        MinY = bounds.min.y;
+        MaxY = bounds.max.y;
     }
 
     void Awake()
