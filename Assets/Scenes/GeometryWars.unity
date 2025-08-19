@@ -1547,7 +1547,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 790481594672310185, guid: cc48611bade1740b29fb53e4361c8cb0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 1.82
       objectReference: {fileID: 0}
     - target: {fileID: 790481594672310185, guid: cc48611bade1740b29fb53e4361c8cb0, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1585,14 +1585,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1186378271976851898, guid: cc48611bade1740b29fb53e4361c8cb0, type: 3}
-      propertyPath: cam
-      value: 
-      objectReference: {fileID: 1988445177}
-    - target: {fileID: 1186378271976851898, guid: cc48611bade1740b29fb53e4361c8cb0, type: 3}
-      propertyPath: mainCamera
-      value: 
-      objectReference: {fileID: 1988445177}
     - target: {fileID: 6568461122354683221, guid: cc48611bade1740b29fb53e4361c8cb0, type: 3}
       propertyPath: m_Name
       value: Player Ship
@@ -1601,18 +1593,6 @@ PrefabInstance:
       propertyPath: aimCursor
       value: 
       objectReference: {fileID: 1699374170}
-    - target: {fileID: 6751211740161147485, guid: cc48611bade1740b29fb53e4361c8cb0, type: 3}
-      propertyPath: hitCooldown
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6751211740161147485, guid: cc48611bade1740b29fb53e4361c8cb0, type: 3}
-      propertyPath: bulletPrefab
-      value: 
-      objectReference: {fileID: 8776876888765538232, guid: 11ec4557348004734819d111b6b9e651, type: 3}
-    - target: {fileID: 6751211740161147485, guid: cc48611bade1740b29fb53e4361c8cb0, type: 3}
-      propertyPath: facingOffsetDeg
-      value: 30
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

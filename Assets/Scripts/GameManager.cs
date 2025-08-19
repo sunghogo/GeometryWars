@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
     [field: SerializeField] public float MaxY { get; private set; } = 0;
     [field: SerializeField] public int Score { get; private set; } = 0;
     [field: SerializeField] public int HighScore { get; private set; } = 0;
-    [field: SerializeField] public int Lives { get; private set; }
+    [field: SerializeField] public int Lives { get; private set; } = 3;
 
 
     public void SetPlayerPosition(Vector3 newPosition) {
@@ -81,7 +81,11 @@ public class GameManager : MonoBehaviour
         GameOver = false;
         ChangeLevel = false;
         ResetLives();
+        ResetScore();
         OnGameStart?.Invoke();
+        OnLivesChanged?.Invoke(Lives);
+        OnScoreChanged?.Invoke(Score);
+        OnHighScoreChanged?.Invoke(HighScore);
     }
 
     public void EndGame()
@@ -95,7 +99,6 @@ public class GameManager : MonoBehaviour
         {
             UpdateHighScore();
         }
-        ResetScore();
         OnGameOver?.Invoke();
     }
 
@@ -135,6 +138,8 @@ public class GameManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        ResetLives();
     }
 
     void Start()

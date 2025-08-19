@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    [Header("Refs")]
+    [SerializeField] AudioClip explosionClip;
 
     [field: Header("Movement")]
     [field: SerializeField] protected float moveSpeed = 5f;
@@ -42,6 +44,7 @@ public class Enemy : MonoBehaviour
 
     public void Hit()
     {
+        AudioHelper.PlayClipAtPoint(explosionClip, transform.position, 0.5f);
         GameManager.Instance.IncrementScore();
         Destroy(gameObject);
     }

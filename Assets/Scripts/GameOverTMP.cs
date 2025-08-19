@@ -9,7 +9,7 @@ public class GameOverTMP : MonoBehaviour
     void Awake()
     {
         tmp = GetComponent<TextMeshProUGUI>();
-        if (GameManager.Instance) tmp.text = GameManager.Instance.Score.ToString();
+        
         GameManager.OnGameOver += HandleGameOver;
         GameManager.OnGameStart += HandleGameStart;
         HandleGameStart();

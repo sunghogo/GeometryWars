@@ -51,12 +51,12 @@ MonoBehaviour:
   curveGain: -0.33
   logBase: 2
   minInterval: 1
-  maxInterval: 2
+  maxInterval: 10
   areaSize: {x: 1, y: 1}
   spawnOnEdges: 1
   edgeInset: 0.25
   maxBurstCount: 3
   burstBaseChance: 0.1
   burstGain: 0.05
-  triggerChance: 0.75
+  triggerChance: 0.25
   randomizeInitialPhase: 1

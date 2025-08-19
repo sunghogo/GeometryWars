@@ -1,157 +1,154 @@
-Shader "Custom/NeonBall2D"
+Shader "Custom/BulletNeon"
 {
     Properties
     {
-        [PerRendererData]_MainTex("Sprite",2D)="white"{}
-        _Color("Sprite Tint", Color) = (1,1,1,1)
+        [PerRendererData]_MainTex("Sprite Texture", 2D) = "white" {}
+        [PerRendererData]_Color("Tint", Color) = (1,1,1,1)
 
-        // Core colors
-        [HDR]_GlowColor("Inner Glow Color", Color) = (0.2, 0.8, 1.4, 1)
-        [HDR]_RimColor ("Rim Color", Color)       = (0.6, 1.0, 1.0, 1)
-        [HDR]_SweepColor("Sweep Color", Color)    = (1.2, 1.2, 1.2, 1)
+        // Look & feel
+        _CoreColor   ("Core Color", Color) = (1,1,1,1)
+        _GlowColor   ("Glow Color", Color) = (0.0, 1.0, 1.0, 1.0)
+        _EdgeColor   ("Edge Color", Color) = (0.2, 0.9, 1.0, 1.0)
 
-        // Glow & rim shaping
-        _GlowStrength("Glow Strength", Range(0,3)) = 1.2
-        _GlowRadius  ("Glow Radius",   Range(0,1)) = 0.55
-        _RimStrength ("Rim Strength",  Range(0,3)) = 1.0
-        _RimWidth    ("Rim Width",     Range(0.001,0.5)) = 0.12
-        _RimSoftness ("Rim Softness",  Range(0,1)) = 0.5
+        _CoreRadius  ("Core Radius", Range(0.0, 1.0)) = 0.25
+        _Feather     ("Feather", Range(0.001, 1.0)) = 0.25
+        _GlowMul     ("Glow Strength", Range(0.0, 6.0)) = 2.0
 
-        // Animated sweep highlight
-        _SweepStrength("Sweep Strength", Range(0,3)) = 0.8
-        _SweepWidth   ("Sweep Width",    Range(0.05,1)) = 0.28
-        _SweepSpeed   ("Sweep Speed",    Range(-4,4)) = 1.2
-        _SweepAngleDeg("Sweep Angle (deg)", Range(0,180)) = 40
+        // Streak / tail aligned to velocity
+        _TailLen     ("Tail Length", Range(0.0, 2.0)) = 1.0
+        _TailPower   ("Tail Sharpness", Range(0.5, 6.0)) = 2.0
 
-        // Optional outline
-        [HDR]_EdgeColor("Edge Color", Color) = (1,1,1,0.15)
-        _EdgeWidth("Edge Width", Range(0,0.2)) = 0.05
+        // Sparkle
+        _TwinkleAmt  ("Twinkle Amount", Range(0.0, 1.0)) = 0.25
+        _TwinkleSpd  ("Twinkle Speed", Range(0.0, 20.0)) = 6.0
+
+        // Set per-bullet from script
+        _Dir         ("Direction XY (normalized)", Vector) = (1,0,0,0)
+        _SpeedMag    ("Speed Magnitude", Float) = 1.0
     }
 
     SubShader
     {
-        Tags { "Queue"="Transparent" "RenderType"="Transparent" "IgnoreProjector"="True" "CanUseSpriteAtlas"="True" }
-        Blend SrcAlpha OneMinusSrcAlpha
+        Tags{
+            "Queue"="Transparent"
+            "RenderType"="Transparent"
+            "IgnoreProjector"="True"
+            "CanUseSpriteAtlas"="True"
+        }
         Cull Off
         ZWrite Off
-        ZTest Always
+        Blend One One // additive for hot neon
 
         Pass
         {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            #pragma target 3.0
+            #pragma target 2.0
             #include "UnityCG.cginc"
 
-            sampler2D _MainTex; float4 _MainTex_ST;
+            sampler2D _MainTex;
+            float4 _MainTex_TexelSize;
             fixed4 _Color;
 
-            fixed4 _GlowColor, _RimColor, _SweepColor, _EdgeColor;
-            float _GlowStrength, _GlowRadius;
-            float _RimStrength, _RimWidth, _RimSoftness;
-            float _SweepStrength, _SweepWidth, _SweepSpeed, _SweepAngleDeg;
-            float _EdgeWidth;
+            fixed4 _CoreColor;
+            fixed4 _GlowColor;
+            fixed4 _EdgeColor;
 
-            struct appdata {
+            float _CoreRadius;
+            float _Feather;
+            float _GlowMul;
+
+            float _TailLen;
+            float _TailPower;
+
+            float _TwinkleAmt;
+            float _TwinkleSpd;
+
+            float4 _Dir;      // xy used
+            float  _SpeedMag; // optional, for subtle boost
+
+            struct appdata
+            {
                 float4 vertex : POSITION;
                 float2 uv     : TEXCOORD0;
                 fixed4 color  : COLOR;
             };
 
-            struct v2f {
-                float4 pos   : SV_POSITION;
-                float2 uv    : TEXCOORD0;   // atlas uv
-                float2 uv01  : TEXCOORD1;   // 0..1 rect uv
-                fixed4 color : COLOR;
+            struct v2f
+            {
+                float4 pos : SV_POSITION;
+                float2 uv  : TEXCOORD0;
+                fixed4 col : COLOR;
             };
 
             v2f vert(appdata v)
             {
                 v2f o;
-                o.pos   = UnityObjectToClipPos(v.vertex);
-                o.uv    = TRANSFORM_TEX(v.uv, _MainTex);
-                o.uv01  = v.uv;
-                o.color = v.color * _Color;
+                o.pos = UnityObjectToClipPos(v.vertex);
+                o.uv  = v.uv;
+                o.col = v.color * _Color;
                 return o;
             }
 
-            // Smooth band helper: returns 0..1 inside [edge - width .. edge]
-            float rimBand(float x, float edge, float width, float softness)
+            // Cheap hash for twinkle
+            float hash21(float2 p)
             {
-                float inner = edge - width;
-                float t = saturate((x - inner) / max(width, 1e-5));
-                // softness curves the edge
-                return pow(t, lerp(1.0, 2.5, softness));
+                p = frac(p * float2(123.34, 345.45));
+                p += dot(p, p + 34.345);
+                return frac(p.x * p.y);
             }
 
             fixed4 frag(v2f i) : SV_Target
             {
-                fixed4 baseTex = tex2D(_MainTex, i.uv) * i.color;
-                float  alpha   = baseTex.a;
-                fixed3 col     = baseTex.rgb;
+                // Sample sprite alpha as mask (use white sprite)
+                fixed4 texCol = tex2D(_MainTex, i.uv);
+                float a = texCol.a * i.col.a;
+                if (a <= 0) discard;
 
-                // Map to centered quad space: (-1..1)
-                float2 p = i.uv01 * 2.0 - 1.0;
-                // Radial distance from center (treat like a ball even if sprite is square)
-                float r = length(p);
+                // UV in -1..1 space, X horizontal, Y vertical (centered)
+                float2 uv = i.uv * 2.0 - 1.0;
 
-                // -------- Inner glow (strongest in the center, fades toward radius) --------
-                // Build a soft falloff from center: 1 at r=0 down to 0 at r>=_GlowRadius
-                float glowMask = 1.0 - smoothstep(0.0, max(_GlowRadius, 1e-5), r);
-                col += _GlowColor.rgb * (glowMask * _GlowStrength);
+                // Core: circular falloff
+                float r = length(uv);
+                float core = smoothstep(_CoreRadius, _CoreRadius - _Feather, r);
 
-                // -------- Rim light (bright near the edge of the disc) --------
-                // Edge at r≈1 for a full quad; tighten slightly to avoid square corners
-                float edge = 1.0;
-                float rim = rimBand(r, edge, _RimWidth, _RimSoftness);
-                col += _RimColor.rgb * (rim * _RimStrength);
+                // Velocity-aligned tail: project uv onto direction
+                float2 dir = normalize(_Dir.xy + 1e-5);
+                float along = dot(uv, dir);      // forward axis
+                float perp  = dot(uv, float2(-dir.y, dir.x)); // sideways axis
 
-                // -------- Animated sweep highlight --------
-                if (_SweepStrength > 0.0001)
-                {
-                    // Build a rotating axis using time and angle
-                    float a = radians(_SweepAngleDeg);
-                    float2 dir = normalize(float2(cos(a), sin(a)));
+                // Tail is bright in front, stretches backward (negative along)
+                float tail = saturate(1.0 - (perp*perp));
+                float back = saturate(-along * _TailLen);
+                tail = pow(tail * back, _TailPower);
 
-                    // Rotate sweep along dir and animate offset with time
-                    float phase = _Time.y * _SweepSpeed; // _Time.y ≈ t*2
-                    // Signed coordinate along the sweep direction
-                    // -------- Animated sweep highlight (wrapped) --------
-                    if (_SweepStrength > 0.0001)
-                    {
-                        float a = radians(_SweepAngleDeg);
-                        float2 dir = normalize(float2(cos(a), sin(a)));
+                // Edge highlight (rim)
+                float rim = smoothstep(1.0, 1.0 - _Feather, r);
 
-                        // range along the quad in dir is ~[-1..1] (length ~= 2.0)
-                        // Wrap the sweep center into [-1..1] so it keeps looping.
-                        float t = _Time.y * _SweepSpeed; // seconds * speed
-                        float sweepCenter = frac(t * 0.5) * 2.0 - 1.0;   // loops -1 -> +1 (one-way)
-                        // If you prefer ping-pong (back and forth), use:
-                        // float sweepCenter = 1.0 - 2.0 * abs(frac(t * 0.5) - 0.5);
+                // Twinkle (subtle flicker)
+                float t = _Time.y * _TwinkleSpd;
+                float tw = (hash21(floor(uv * 7.0 + t)) * 2.0 - 1.0) * _TwinkleAmt;
 
-                        // Signed coord along sweep axis, centered on wrapped position
-                        float s = dot(p, dir) - sweepCenter;
+                // Compose
+                float glow = (1.0 - core) + tail * 1.5 + rim * 0.25 + tw;
+                glow = max(glow, 0.0);
 
-                        float w2 = max(_SweepWidth*_SweepWidth, 1e-6);
-                        float sweepMask = exp(-(s*s) / w2);
+                // Speed can modestly boost intensity
+                float boost = saturate(_SpeedMag * 0.1 + 0.9);
 
-                        col += _SweepColor.rgb * (sweepMask * _SweepStrength);
-                    }
-                }
+                fixed3 col =
+                    _CoreColor.rgb * (1.0 - core) * 2.0 +
+                    _GlowColor.rgb * glow * _GlowMul * boost;
 
-                // -------- Optional thin edge outline (nice with bloom) --------
-                if (_EdgeWidth > 0.0001 && _EdgeColor.a > 0.0001)
-                {
-                    float edgeMask = smoothstep(1.0 - _EdgeWidth*2.0, 1.0, r);
-                    col = lerp(col, _EdgeColor.rgb, _EdgeColor.a * edgeMask);
-                }
+                // Add a hint of edge color
+                col = lerp(col, _EdgeColor.rgb, rim * 0.35);
 
-                return fixed4(col, alpha);
+                // Additive output uses alpha as intensity gate from source sprite
+                return fixed4(col * a, a);
             }
             ENDCG
         }
     }
-
     FallBack "Sprites/Default"
 }

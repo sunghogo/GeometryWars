@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: NeonBall2D
-  m_Shader: {fileID: 4800000, guid: 65795777b5ca747dab4a9c4d92cd4b55, type: 3}
+  m_Name: GlowSpritePurple
+  m_Shader: {fileID: 4800000, guid: efdbe366dfe234d7489ae5640a6b41aa, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -61,59 +61,35 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Afterimages: 2
     - _BumpScale: 1
-    - _CoreRadius: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
+    - _DistortAmount: 0.25
     - _DstBlend: 0
-    - _EdgeWidth: 0.2
-    - _Feather: 0.25
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _GlowMul: 0.75
-    - _GlowRadius: 1
-    - _GlowStrength: 3
+    - _GlowStrength: 2
+    - _HitAmount: 0
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
+    - _OutlineThickness: 2
     - _Parallax: 0.02
-    - _RimSoftness: 0.5
-    - _RimStrength: 1
-    - _RimWidth: 0.12
+    - _PulseAmount: 1
+    - _PulseSpeed: 8
     - _SmoothnessTextureChannel: 0
+    - _SoftEdge: 1
     - _SpecularHighlights: 1
-    - _SpeedMag: 1
     - _SrcBlend: 1
-    - _SweepAngleDeg: 45
-    - _SweepSpeed: 4
-    - _SweepStrength: 1
-    - _SweepWidth: 0.15
-    - _TailLen: 1.5
-    - _TailPower: 2
-    - _TrailAlpha: 0.5
-    - _TrailIntensity: 1.2
-    - _TrailLength: 28
-    - _TrailLength01: 0.6
-    - _TrailSoftness: 0.6
-    - _TrailWidth: 14
-    - _TrailWidth01: 0.35
-    - _TwinkleAmt: 0.25
-    - _TwinkleSpd: 6
     - _UVSec: 0
-    - _VelMag: 8
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0, g: 0, b: 0, a: 1}
-    - _CoreColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Dir: {r: 1, g: 0, b: 0, a: 0}
-    - _EdgeColor: {r: 0.1254902, g: 0.6980392, b: 0.6666667, a: 1}
+    - _BaseColor: {r: 0, g: 0, b: 0, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GlowColor: {r: 0.2509804, g: 0.8784314, b: 0.8156863, a: 1}
-    - _RimColor: {r: 0.6821778, g: 0.6, b: 1, a: 1}
-    - _SweepColor: {r: 0.745283, g: 0.745283, b: 0.745283, a: 1}
-    - _TrailColor: {r: 0.3, g: 0.9, b: 1.8, a: 1}
-    - _VelDir: {r: 1, g: 0, b: 0, a: 0}
+    - _GlowColor: {r: 0.9607843, g: 0, b: 0.8392157, a: 1}
+    - _HitColor: {r: 1, g: 1, b: 1, a: 1}
+    - _OutlineColor: {r: 0.49803922, g: 0.49803922, b: 0.49803922, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

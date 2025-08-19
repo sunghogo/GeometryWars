@@ -6,6 +6,9 @@ public class PlayerShip : MonoBehaviour
     [Header("Refs)")]
     [SerializeField] AimCursor aimCursor;
     [SerializeField] GameObject bulletPrefab;
+    [SerializeField] AudioClip laser1Clip;
+    [SerializeField] AudioClip laser2Clip;
+    [SerializeField] AudioClip explosionClip;
 
 
     [field: Header("Movement")]
@@ -18,7 +21,7 @@ public class PlayerShip : MonoBehaviour
     [Header("Turning")]
     [SerializeField] float turnSpeedDegPerSec = 720f;
     [SerializeField] bool faceDirection = true;
-    [SerializeField] float facingOffsetDeg = 30f;
+    [SerializeField] float facingOffsetDeg = -90f;
 
     [Header("Shooting")]
     [SerializeField] float fireCooldown = 0.2f;
@@ -27,8 +30,10 @@ public class PlayerShip : MonoBehaviour
     [SerializeField] float hitCooldown = 0.5f;
 
     Rigidbody2D rb;
+    AudioSource audioSource;
     InputAction moveAction;
     InputAction fireAction;
+    SpritePulseAndHit spritePulseAndHit;
     float timer = 0f;
     bool hit;
     float hitTimer = 0f;
@@ -37,6 +42,9 @@ public class PlayerShip : MonoBehaviour
     {
         startingPositon = transform.position;
         rb = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
+        audioSource.volume = 0.75f;
+        spritePulseAndHit = GetComponent<SpritePulseAndHit>();
         InitializeInput();
 
         GameManager.OnGameOver += HandleGameOver;
@@ -63,6 +71,7 @@ public class PlayerShip : MonoBehaviour
 
     void HandleGameOver()
     {
+        AudioHelper.PlayClipAtPoint(explosionClip, transform.position, 0.75f);
         Direction = Vector2.up;
         Movement = Vector2.zero;
         transform.position = startingPositon;
@@ -80,10 +89,11 @@ public class PlayerShip : MonoBehaviour
         {
             if (!hit)
             {
+                spritePulseAndHit.TriggerHitFlash();
                 GameManager.Instance.DecrementLives();
-                 hit = true;
+                hit = true;
             }
-            Destroy(collision.gameObject);
+            collision.gameObject.GetComponent<Enemy>().Hit();
         }
     }
 
@@ -179,6 +189,10 @@ public class PlayerShip : MonoBehaviour
     void Shoot()
     {
         if (!bulletPrefab) return;
+
+        int bit =  Random.Range(0, 2);
+        if (bit == 0) audioSource.PlayOneShot(laser1Clip);
+        else audioSource.PlayOneShot(laser2Clip);
 
         // Spawn the bullet at the ship’s position, facing the current Direction
         GameObject bullet = Instantiate(

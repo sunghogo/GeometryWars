@@ -38,7 +38,9 @@ public class Bullet : MonoBehaviour
         {
             Enemy enemy = hit.collider.GetComponent<Enemy>();
             if (enemy != null)
+            {
                 enemy.Hit();
+            }
 
             Destroy(gameObject);
             return true;

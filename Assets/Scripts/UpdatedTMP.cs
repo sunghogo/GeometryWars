@@ -20,7 +20,7 @@ public class UpdatedTMP : MonoBehaviour
             GameManager.OnHighScoreChanged += UpdateText;
         } else if (gameObject.CompareTag("Lives"))
         {
-            if (GameManager.Instance) tmp.text = GameManager.Instance.HighScore.ToString();
+            if (GameManager.Instance) tmp.text = GameManager.Instance.Lives.ToString();
             GameManager.OnLivesChanged += UpdateText;
         }
         GameManager.OnGameOver += HandleGameOver;

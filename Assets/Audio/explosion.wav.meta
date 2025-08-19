@@ -1,7 +1,5 @@
 fileFormatVersion: 2
-guid: c91f5afeb035d46b6b866efe81a44733
-labels:
-- UnityAI
+guid: 77abbb350e7f74f8fbb0482c95b30869
 AudioImporter:
   externalObjects: {}
   serializedVersion: 8
@@ -15,7 +13,7 @@ AudioImporter:
     conversionMode: 0
     preloadAudioData: 0
   platformSettingOverrides: {}
-  forceToMono: 0
+  forceToMono: 1
   normalize: 1
   loadInBackground: 0
   ambisonic: 0
