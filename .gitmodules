@@ -1,0 +1,3 @@
+[submodule "Geometry Wars WebGl Build"]
+	path = Geometry Wars WebGl Build
+	url = https://github.com/sunghogo/GeometryWarsWebGL.git

@@ -1,4 +1,3 @@
-// ScoreUI.cs
 using UnityEngine;
 using TMPro;
 
@@ -9,7 +8,6 @@ public class TextTMP : MonoBehaviour
     void Awake()
     {
         tmp = GetComponent<TextMeshProUGUI>();
-
         GameManager.OnGameOver += HandleGameOver;
         GameManager.OnGameStart += HandleGameStart;
     }
